@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2022.06.25 → Forever · 四周年纪念</title>
+<style>
+/* ========================================
+   基础重置 & 全局变量
+   ======================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #faf8f5;
+  --text: #3d3d3d;
+  --text-light: #8a8580;
+  --accent: #c47f6b;
+  --accent-light: #dba99b;
+  --sage: #a8b5a2;
+  --sage-light: #c5cfc0;
+  --beige: #e8e0d5;
+  --white: #ffffff;
+  --shadow: 0 2px 20px rgba(0,0,0,0.06);
+  --radius: 12px;
+  --max-width: 800px;
+  --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   导航栏
+   ======================================== */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 12px 24px;
+  display: flex; justify-content: center; gap: 20px;
+  background: rgba(250,248,245,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--beige);
+  transition: transform 0.3s;
+  flex-wrap: wrap;
+}
+.nav.hidden { transform: translateY(-100%); }
+.nav a {
+  text-decoration: none; color: var(--text-light);
+  font-size: 0.85rem; letter-spacing: 0.5px;
+  transition: color 0.3s;
+}
+.nav a:hover, .nav a.active { color: var(--accent); }
+
+/* ========================================
+   Hero 封面区
+   ======================================== */
+.hero {
+  position: relative;
+  height: 100vh; min-height: 600px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  color: #fff;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: url("照片/封面.jpg") center/cover no-repeat;
+  filter: brightness(0.55);
+  z-index: 0;
+}
+.hero-content { position: relative; z-index: 1; padding: 20px; }
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 300; letter-spacing: 4px;
+  margin-bottom: 16px;
+  font-family: Georgia, "Noto Serif SC", "STSong", serif;
+}
+.hero .subtitle {
+  font-size: 1.1rem; font-weight: 300;
+  letter-spacing: 2px; opacity: 0.85;
+  margin-bottom: 8px;
+}
+.hero .days-counter {
+  font-size: 0.9rem; opacity: 0.7;
+  letter-spacing: 1px; margin-top: 12px;
+}
+
+.scroll-hint {
+  position: absolute; bottom: 40px; z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  animation: bounce 2s infinite; opacity: 0.7;
+}
+.scroll-hint span { font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 8px; }
+.scroll-hint .arrow { width: 20px; height: 20px; border-right: 1px solid #fff; border-bottom: 1px solid #fff; transform: rotate(45deg); }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+
+/* ========================================
+   通用章节容器
+   ======================================== */
+.section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 100px 24px;
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.section.visible { opacity: 1; transform: translateY(0); }
+
+/* ========================================
+   前言 — 日记本风格
+   ======================================== */
+.preface {
+  text-align: center;
+  position: relative;
+}
+.preface::before {
+  content: "❧";
+  display: block;
+  font-size: 2rem; color: var(--accent-light);
+  margin-bottom: 32px;
+}
+.preface .quote {
+  font-size: 1.15rem; color: var(--text-light);
+  line-height: 2.2; letter-spacing: 1px;
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-style: italic;
+}
+
+/* ========================================
+   章节卡片
+   ======================================== */
+.chapter-header {
+  text-align: center; margin-bottom: 48px;
+}
+.chapter-num {
+  font-size: 0.8rem; letter-spacing: 3px;
+  color: var(--accent); text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.chapter-title {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 400; letter-spacing: 2px;
+  font-family: Georgia, "Noto Serif SC", "STSong", serif;
+  color: var(--text);
+}
+.chapter-divider {
+  width: 40px; height: 2px;
+  background: var(--accent-light);
+  margin: 20px auto;
+  border-radius: 1px;
+}
+
+.chapter-body {
+  display: flex; gap: 40px; align-items: flex-start;
+}
+.chapter-text {
+  flex: 1; font-size: 1rem;
+  color: var(--text-light); line-height: 2;
+}
+.chapter-text p { margin-bottom: 16px; }
+
+/* 章节照片区 */
+.chapter-photos {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-flow: dense;
+  gap: 12px;
+  margin-top: 40px;
+}
+.chapter-photos.is-empty {
+  display: none;
+}
+.photo-card {
+  position: relative;
+  grid-column: span 2;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.photo-card.feature {
+  grid-column: span 3;
+  grid-row: span 2;
+}
+.photo-card.wide {
+  grid-column: span 4;
+}
+.photo-card.tall {
+  grid-row: span 2;
+}
+.photo-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+.photo-card.tall img,
+.photo-card.feature img {
+  aspect-ratio: 3/4;
+}
+.photo-card.wide img {
+  aspect-ratio: 16/10;
+}
+.photo-card figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 34px 14px 12px;
+  color: #fff;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  letter-spacing: 0.5px;
+  background: linear-gradient(to top, rgba(0,0,0,0.58), rgba(0,0,0,0));
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.photo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+.photo-card:hover img {
+  transform: scale(1.04);
+}
+
+/* 奇数章节文字在左，偶数文字在右 */
+@media (min-width: 768px) {
+  .chapter-body.reverse { flex-direction: row-reverse; }
+}
+
+/* ========================================
+   时间轴
+   ======================================== */
+.timeline {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-left: 40px;
+}
+.timeline::before {
+  content: "";
+  position: absolute; left: 18px; top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent-light), var(--sage-light));
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 48px;
+  padding-left: 32px;
+}
+.timeline-item::before {
+  content: "";
+  position: absolute; left: -26px; top: 6px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+.timeline-date {
+  font-size: 0.85rem; color: var(--accent);
+  letter-spacing: 1px; margin-bottom: 4px;
+}
+.timeline-text {
+  font-size: 1rem; color: var(--text);
+}
+.timeline-img {
+  margin-top: 12px; border-radius: 8px;
+  max-width: 100%; max-height: 200px; object-fit: cover;
+}
+
+/* ========================================
+   四年年轮
+   ======================================== */
+.rings-intro {
+  max-width: 620px;
+  margin: -20px auto 48px;
+  text-align: center;
+  color: var(--text-light);
+  line-height: 2;
+  letter-spacing: 0.8px;
+}
+.rings-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(260px, 0.8fr);
+  gap: 48px;
+  align-items: center;
+}
+.ring-stage {
+  position: relative;
+  width: min(100%, 430px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+.year-ring {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: var(--size);
+  height: var(--size);
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(196,127,107,var(--alpha));
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.05), rgba(255,255,255,0));
+  box-shadow: inset 0 0 24px rgba(196,127,107,0.04);
+}
+.ring-core {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 132px;
+  height: 132px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(255,255,255,0.82);
+  border: 1px solid var(--beige);
+  box-shadow: var(--shadow);
+}
+.ring-core strong {
+  font-family: Georgia, "Noto Serif SC", serif;
+  color: var(--accent);
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+}
+.ring-core span {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+.ring-node {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  min-width: 64px;
+  border: 1px solid rgba(196,127,107,0.28);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.88);
+  color: var(--accent);
+  cursor: pointer;
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 0.84rem;
+  letter-spacing: 1px;
+  padding: 6px 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  transition: transform 0.25s, background 0.25s, color 0.25s;
+}
+.ring-node:hover,
+.ring-node.active {
+  transform: translate(-50%, -50%) scale(1.06);
+  background: var(--accent);
+  color: #fff;
+}
+.ring-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ring-year-card {
+  border-left: 2px solid var(--beige);
+  padding: 12px 0 12px 18px;
+  opacity: 0.72;
+  transition: opacity 0.25s, border-color 0.25s, transform 0.25s;
+}
+.ring-year-card.active {
+  opacity: 1;
+  border-color: var(--accent);
+  transform: translateX(4px);
+}
+.ring-year-card h3 {
+  font-family: Georgia, "Noto Serif SC", serif;
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+}
+.ring-year-card p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+.ring-count {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--sage);
+  font-size: 0.76rem;
+  letter-spacing: 1px;
+}
+.ring-thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.ring-thumbs img {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.ring-thumbs img:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+/* ========================================
+   照片墙
+   ======================================== */
+.photo-wall-intro {
+  max-width: 620px;
+  margin: -20px auto 36px;
+  text-align: center;
+  color: var(--text-light);
+  line-height: 2;
+  letter-spacing: 0.8px;
+}
+.photo-wall-grid {
+  column-count: 4;
+  column-gap: 12px;
+}
+.wall-photo-card {
+  display: block;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--white);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.06);
+  cursor: pointer;
+  break-inside: avoid;
+}
+.wall-photo-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.35s, filter 0.35s;
+}
+.wall-photo-card:hover img {
+  transform: scale(1.025);
+  filter: saturate(1.04);
+}
+.photo-wall-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}
+.load-more-wall {
+  border: 1px solid rgba(196,127,107,0.3);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.86);
+  color: var(--accent);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.86rem;
+  letter-spacing: 1px;
+  padding: 10px 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+  transition: transform 0.25s, background 0.25s, color 0.25s;
+}
+.load-more-wall:hover {
+  transform: translateY(-2px);
+  background: var(--accent);
+  color: #fff;
+}
+.load-more-wall[hidden] {
+  display: none;
+}
+
+/* ========================================
+   Lightbox
+   ======================================== */
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.92);
+  justify-content: center; align-items: center;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 90vw; max-height: 85vh;
+  object-fit: contain; border-radius: 4px;
+}
+.lightbox-close {
+  position: absolute; top: 24px; right: 32px;
+  font-size: 2rem; color: #fff; cursor: pointer;
+  background: none; border: none; opacity: 0.7;
+  transition: opacity 0.3s;
+}
+.lightbox-close:hover { opacity: 1; }
+.lightbox-prev, .lightbox-next {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  font-size: 2rem; color: #fff; cursor: pointer;
+  background: none; border: none; opacity: 0.6; padding: 16px;
+  transition: opacity 0.3s;
+}
+.lightbox-prev:hover, .lightbox-next:hover { opacity: 1; }
+.lightbox-prev { left: 16px; }
+.lightbox-next { right: 16px; }
+.lightbox-caption {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  color: rgba(255,255,255,0.7); font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+/* ========================================
+   浮动控制
+   ======================================== */
+.floating-controls {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.float-btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(196,127,107,0.2);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.86);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: transform 0.3s, background 0.3s, color 0.3s, opacity 0.3s;
+}
+.float-btn:hover,
+.float-btn.active {
+  transform: translateY(-2px);
+  background: var(--accent);
+  color: #fff;
+}
+.back-to-top {
+  opacity: 0;
+  pointer-events: none;
+}
+.back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ========================================
+   音乐播放器 & 固定歌词
+   ======================================== */
+/* 音乐播放按钮 — 左下角，歌词上方 */
+.music-btn-wrap {
+  position: fixed;
+  bottom: 28px;
+  left: 24px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.music-btn {
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(196,127,107,0.25);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.88);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: transform 0.3s, background 0.3s, color 0.3s;
+  font-family: Georgia, "Noto Serif SC", serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+.music-btn:hover {
+  transform: translateY(-2px);
+}
+.music-btn.playing {
+  background: var(--accent);
+  color: #fff;
+  animation: musicPulse 2s infinite;
+}
+@keyframes musicPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196,127,107,0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(196,127,107,0); }
+}
+.music-hint {
+  font-size: 0.78rem;
+  color: var(--accent);
+  letter-spacing: 1px;
+  opacity: 0.85;
+  pointer-events: none;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  white-space: nowrap;
+}
+.music-btn.playing ~ .music-hint {
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 767px) {
+  .music-btn-wrap {
+    bottom: 74px;
+    left: 12px;
+  }
+  .music-hint {
+    font-size: 0.7rem;
+  }
+}
+
+/* 桌面歌词 — 左下角固定 */
+.desktop-lyrics {
+  position: fixed;
+  bottom: 84px;
+  left: 24px;
+  z-index: 85;
+  pointer-events: none;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 0.5s;
+  max-width: 400px;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+.desktop-lyrics.visible {
+  opacity: 1;
+}
+.desktop-lyrics .lyric-current {
+  display: block;
+  font-size: 1.1rem;
+  color: #c0392b;
+  letter-spacing: 1.5px;
+  line-height: 1.6;
+  font-weight: 600;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  text-shadow: 0 1px 4px rgba(255,255,255,0.9);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.desktop-lyrics .lyric-next {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: #5a3e36;
+  opacity: 0.65;
+  letter-spacing: 1px;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  text-shadow: 0 1px 4px rgba(255,255,255,0.8);
+  transition: opacity 0.4s;
+}
+.desktop-lyrics .lyric-song-tag {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  color: var(--accent);
+  letter-spacing: 2px;
+  opacity: 0.8;
+  font-weight: 500;
+  font-family: Georgia, "Noto Serif SC", serif;
+}
+
+/* 移动端桌面歌词 */
+@media (max-width: 767px) {
+  .desktop-lyrics {
+    bottom: 130px;
+    left: 12px;
+    right: 60px;
+    max-width: none;
+    padding: 10px 14px;
+  }
+  .desktop-lyrics .lyric-current {
+    font-size: 0.95rem;
+  }
+  .desktop-lyrics .lyric-next {
+    font-size: 0.8rem;
+  }
+}
+
+/* ========================================
+   结语
+   ======================================== */
+.outro {
+  text-align: center; padding: 120px 24px;
+  max-width: var(--max-width); margin: 0 auto;
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.outro.visible { opacity: 1; transform: translateY(0); }
+.outro h2 {
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1.8rem; font-weight: 400;
+  letter-spacing: 3px; margin-bottom: 16px;
+}
+.outro p {
+  color: var(--text-light); letter-spacing: 1px; line-height: 2;
+}
+.outro .heart {
+  font-size: 3rem; margin-top: 32px;
+  animation: heartbeat 1.5s infinite;
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.15); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.1); }
+  60% { transform: scale(1); }
+}
+
+/* ========================================
+   页脚
+   ======================================== */
+.footer {
+  text-align: center; padding: 40px 24px;
+  color: var(--text-light); font-size: 0.8rem;
+  letter-spacing: 1px; border-top: 1px solid var(--beige);
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+@media (max-width: 767px) {
+  .section { padding: 64px 20px; }
+  .chapter-body { flex-direction: column; gap: 24px; }
+  .chapter-body.reverse { flex-direction: column; }
+  .timeline { padding-left: 28px; }
+  .rings-layout { grid-template-columns: 1fr; gap: 28px; }
+  .ring-stage { width: min(100%, 340px); }
+  .ring-core { width: 112px; height: 112px; }
+  .ring-node { min-width: 56px; padding: 5px 10px; font-size: 0.78rem; }
+  .ring-year-card { padding-left: 14px; }
+  .photo-wall-grid { column-count: 2; column-gap: 10px; }
+  .wall-photo-card { margin-bottom: 10px; }
+  .chapter-photos { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .photo-card,
+  .photo-card.tall {
+    grid-column: span 1;
+    grid-row: auto;
+  }
+  .photo-card.feature,
+  .photo-card.wide {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .photo-card img {
+    height: auto;
+    min-height: 0;
+  }
+  .photo-card figcaption {
+    position: static;
+    padding: 10px 12px 12px;
+    color: var(--text-light);
+    background: var(--white);
+    opacity: 1;
+    transform: none;
+  }
+  .nav { gap: 12px; padding: 10px 16px; }
+  .nav a { font-size: 0.75rem; }
+  .hero h1 { letter-spacing: 2px; }
+  .floating-controls { right: 14px; bottom: 14px; }
+  .float-btn { width: 40px; height: 40px; }
+}
+
+@media (max-width: 400px) {
+  .ring-stage { width: min(100%, 300px); }
+  .chapter-photos { gap: 8px; }
+  .photo-wall-grid { column-count: 1; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========================================
+     导航栏
+     ======================================== -->
+<nav class="nav" id="nav">
+  <a href="#hero">封面</a>
+  <a href="#preface">前言</a>
+  <a href="#ch1">相恋之前</a>
+  <a href="#ch2">相恋</a>
+  <a href="#ch3">成人礼</a>
+  <a href="#ch4">重逢</a>
+  <a href="#ch5">同行</a>
+  <a href="#ch6">未来</a>
+  <a href="#timeline">时间轴</a>
+  <a href="#rings">年轮</a>
+  <a href="#photo-wall">照片墙</a>
+</nav>
+
+<!-- ========================================
+     Hero 封面
+     ======================================== -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <h1>2022.06.25 → Forever</h1>
+    <p class="subtitle">写给我们的四年</p>
+    <p class="days-counter" id="daysCounter">在一起的第 0 天</p>
+  </div>
+  <div class="scroll-hint">
+    <span>往下翻页</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- ========================================
+     前言
+     ======================================== -->
+<section class="section preface" id="preface">
+  <p class="quote">
+    这是一封写给四年的情书。<br>
+    写我们怎样从三中的走廊和晚霞里相遇，走到成都的烟火、南京的梧桐和常州的夜色里。<br>
+    写校服里的并肩，也写双城之间的牵挂；<br>
+    写每天都能见面的从前，也写后来把视频通话里的像素点，一颗一颗攒成星子。<br>
+    四年里，距离来过很多次，可心动从来没有被带走。<br>
+    所以我想把这些日子认真留下来。<br>
+    留下我们一起经过的青春，留下我们在一千八百公里之间仍然靠近的证据，<br>
+    也留下下一个四年、下下个四年开始之前，最想对你说的那一句：还好是你，一直是你。
+  </p>
+  <!-- ✏️ 修改前言：直接改上面 <p> 里的文字即可 -->
+</section>
+
+<!-- ========================================
+     第一章 · 相恋之前
+     ======================================== -->
+<section class="section" id="ch1">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 1</div>
+    <h2 class="chapter-title">相恋之前</h2>
+    <div class="chapter-divider"></div>
+  </div>
+  <div class="chapter-body">
+    <div class="chapter-text">
+      <p>相恋之前，我们只是三中里彼此经过的人。教室里的风、走廊尽头的光、晚自习前后的喧闹，都还没有被写成爱情，只是普通得不能再普通的青春。</p>
+      <p>可后来再回头看，命运最会把重要的事藏在平常里。某一次转笔划过的弧线，某一道一起想过的数学题，某个并肩望向晚霞的傍晚，都在很久以后悄悄发亮。</p>
+      <p>从初遇、相识到相熟，那些没有说出口的靠近，一点点把我们推向同一个答案。喜欢还没被命名的时候，你已经开始成为我生活里最温柔的方向。</p>
+      <!-- ✏️ 修改第一章正文：在下面继续写你的故事 -->
+    </div>
+  </div>
+  <!-- 第一章照片（按格式添加） -->
+  <div class="chapter-photos" id="photos-ch1">
+  </div>
+</section>
+
+<!-- ========================================
+     第二章 · 相恋
+     ======================================== -->
+<section class="section" id="ch2">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 2</div>
+    <h2 class="chapter-title">相恋</h2>
+    <div class="chapter-divider"></div>
+  </div>
+  <div class="chapter-body reverse">
+    <div class="chapter-text">
+      <p>2022 年 6 月 25 日晚上八点，我永远记得这个时间。从那一刻开始，我们的故事有了一个特别的日期，也有了每一年都值得认真翻回去看的纪念日。</p>
+      <p>世界没有因此忽然变成电影，可在我心里，有一盏灯从那天亮起。它照着我们继续在校服里并肩，照着每天的消息、课间的对视、晚霞下的路，也照着我一次次更确定地选择你。</p>
+      <p>喜欢从那天起不再只是藏在心里的秘密，而是变成可以认真守护的人。我们把青涩的心动过成陪伴，也把普通日子过成了后来一想起就会心软的青春。</p>
+      <!-- ✏️ 修改第二章正文 -->
+    </div>
+  </div>
+  <div class="chapter-photos" id="photos-ch2">
+  </div>
+</section>
+
+<!-- ========================================
+     第三章 · 成人礼与毕业
+     ======================================== -->
+<section class="section" id="ch3">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 3</div>
+    <h2 class="chapter-title">成人礼与毕业</h2>
+    <div class="chapter-divider"></div>
+  </div>
+  <div class="chapter-body">
+    <div class="chapter-text">
+      <p>从 2023 到 2024，我们在同一段青春里慢慢长大。学习、聊天、晚霞、教室，还有那些没有被认真命名的日常，都因为有你而变得珍贵。</p>
+      <p>成人礼那天，我们站在高考与未来的门口。那是一种很郑重的长大：既舍不得校服里的亲密，也开始明白，真正重要的人，要带着她一起走向更远的地方。</p>
+      <p>高考结束，校服时代远去。可它没有被时间带走，而是留在我们心里，成为我们从青涩走向坚定的证明，也成为后来每一次异地重逢时，最柔软的底色。</p>
+      <!-- ✏️ 修改第三章正文 -->
+    </div>
+  </div>
+  <div class="chapter-photos" id="photos-ch3">
+  </div>
+</section>
+
+<!-- ========================================
+     第四章 · 异地与重逢
+     ======================================== -->
+<section class="section" id="ch4">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 4</div>
+    <h2 class="chapter-title">异地与重逢</h2>
+    <div class="chapter-divider"></div>
+  </div>
+  <div class="chapter-body reverse">
+    <div class="chapter-text">
+      <p>2024 年高考结束，我们开始异地。四川到江苏，成都到南京，一千八百公里横在中间。大学给我们的第一课，不是独立生活，而是学会在距离里继续好好相爱。</p>
+      <p>国庆时，我坐十二个小时高铁去到你在的城市。想看看你未来生活和学习的地方，也想在陌生的街道里，找到一点“我们”的坐标。生日烛光、合照、南京的日落，都成了我后来反复想起的画面。</p>
+      <p>五一你来到成都。4 月 30 日晚上七点，几个月的想念终于落成一个紧紧的拥抱。我们一起在江安、望江、春熙路和成都博物馆留下足迹，也一起把短暂的见面过成了真实的生活。</p>
+      <p>送你回去的时候，我努力把情绪压住；可一个人回学校时，孤独感还是涌了上来。也是在这些分别和重逢里，我们更清楚地知道：一千八百公里隔得开城市，却隔不开想念。</p>
+      <!-- ✏️ 修改第四章正文 -->
+    </div>
+  </div>
+  <div class="chapter-photos" id="photos-ch4">
+  </div>
+</section>
+
+<!-- ========================================
+     第五章 · 继续同行
+     ======================================== -->
+<section class="section" id="ch5">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 5</div>
+    <h2 class="chapter-title">继续同行</h2>
+    <div class="chapter-divider"></div>
+  </div>
+  <div class="chapter-body">
+    <div class="chapter-text">
+      <p>后来我们把每一次假期都过成奔赴。暑假回到熟悉的地方，国庆一起去武汉，江风、摩天轮和合照，把新的城市也写进我们的地图。</p>
+      <p>2026 年寒假，你来到我的城市陪我过期末。那些忙碌、复习和赶路，本来很容易让人疲惫，可因为你在身边，它们也变成了安稳的记忆。</p>
+      <p>2026 年五一，我们又去往彼此的城市，在常州。一路上的车票、夜色、拥抱和并肩，像是在反复告诉我：只要终点是你，路远一点也没关系。</p>
+      <p>我的青春里开始有几座城市的天气：成都的雨，南京的风，武汉的江风，常州的夜色。每一座城市都不只是地点，而是我们把想念走成现实的证明。</p>
+      <!-- ✏️ 修改第五章正文 -->
+    </div>
+  </div>
+  <div class="chapter-photos" id="photos-ch5">
+  </div>
+</section>
+
+<!-- ========================================
+     第六章 · 四周年与未来
+     ======================================== -->
+<section class="section" id="ch6">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 6</div>
+    <h2 class="chapter-title">四周年与未来</h2>
+    <div class="chapter-divider"></div>
+  </div>
+  <div class="chapter-body reverse">
+    <div class="chapter-text">
+      <p>第六章留给未来。走到 2026 年 6 月 25 日，我们已经一起经过第 1462 天。那些曾经以为很远的日子，被我们一步一步走到了。</p>
+      <p>四年里，距离来过，分别来过，忙碌和想念也都来过。可你一直在，我也一直在。我们没有把爱说成宏大的誓言，却在每一次回应、等待、奔赴和拥抱里，把它认真做给彼此看。</p>
+      <p>未来还有很多个春夏秋冬，很多次新的出发，很多个还没被命名的普通日子。我想和你继续把它们过成纪念，把这一本双城记，写成永不褪色的情书。</p>
+      <p>四周年快乐，我的女主角。四年只是开始，还有好多好多年，我们一起慢慢写。</p>
+      <!-- ✏️ 修改第六章正文 -->
+    </div>
+  </div>
+  <div class="chapter-photos" id="photos-ch6">
+  </div>
+</section>
+
+<!-- ========================================
+     时间轴
+     ======================================== -->
+<section class="section" id="timeline">
+  <div class="chapter-header">
+    <div class="chapter-num">Memory Lane</div>
+    <h2 class="chapter-title">我们的时间轴</h2>
+    <div class="chapter-divider"></div>
+  </div>
+  <div class="timeline">
+    <!-- ✏️ 时间轴：按格式增减节点 -->
+    <div class="timeline-item">
+      <div class="timeline-date">2022年 · 高一下</div>
+      <div class="timeline-text">在三中相遇，故事从夏末教室、数学题和晚霞开始，也从很多平常瞬间里悄悄发芽</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2022年6月25日 · 晚上八点</div>
+      <div class="timeline-text">正式在一起，故事有了共同的纪念日</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2024年6月 · 成人礼与高考结束</div>
+      <div class="timeline-text">在成人礼的郑重和毕业的告别里长大，我们开始学习隔着一千八百公里继续相爱</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2024年国庆假期 · 南京</div>
+      <div class="timeline-text">坐十二个小时高铁去她的城市，看她未来生活和学习的地方；提前过生日，也把南京的日落留进相册</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2025年五一假期</div>
+      <div class="timeline-text">她来到成都，一起在江安、望江、春熙路、成都博物馆留下足迹</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2025年6月25日 · 三周年</div>
+      <div class="timeline-text">我们的三周年记：从校服到双城的星轨，记录第 1097 天</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2025年国庆假期</div>
+      <div class="timeline-text">一起去武汉旅游，江风、摩天轮和合照，把新的城市也写进我们的地图</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026年寒假</div>
+      <div class="timeline-text">她来到我的城市陪我过期末，忙碌的日子也因为陪伴变得安稳</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026年五一假期</div>
+      <div class="timeline-text">我们去往彼此的城市，也去往常州，继续把距离走成见面的路</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026年6月25日 · 四周年</div>
+      <div class="timeline-text">第 1462 天，我们的故事还在继续 ✨</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     四年年轮
+     ======================================== -->
+<section class="section" id="rings">
+  <div class="chapter-header">
+    <div class="chapter-num">Annual Rings</div>
+    <h2 class="chapter-title">四年年轮</h2>
+    <div class="chapter-divider"></div>
+  </div>
+  <p class="rings-intro">
+    一圈是一年。把校服里的靠近、南京的日落、成都的重逢常州的夜色，都慢慢收进同一个名字里。
+  </p>
+  <div class="rings-layout">
+    <div class="ring-stage" id="ringStage" aria-label="四年照片年轮">
+      <!-- JS 动态渲染年轮 -->
+    </div>
+    <div class="ring-summary" id="ringSummary">
+      <!-- JS 动态渲染年份注脚 -->
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     照片墙
+     ======================================== -->
+<section class="section" id="photo-wall">
+  <div class="chapter-header">
+    <div class="chapter-num">Photo Wall</div>
+    <h2 class="chapter-title">照片墙</h2>
+    <div class="chapter-divider"></div>
+  </div>
+  <p class="photo-wall-intro">
+    更多没有被章节收住的日常，也都在这里。
+  </p>
+  <div class="photo-wall-grid" id="photoWallGrid" aria-label="更多照片">
+  </div>
+  <div class="photo-wall-actions">
+    <button class="load-more-wall" id="loadMoreWall" type="button">展开更多照片</button>
+  </div>
+</section>
+
+<!-- ========================================
+     结语
+     ======================================== -->
+<section class="outro" id="outro">
+  <h2>未来可期</h2>
+  <p>
+    第六章的名字叫“未来”。<br>
+    这一章，写我们还要一起去的明天。<br>
+    四年只是开始，<br>
+    往后的每一圈年轮，<br>
+    都想和你一起慢慢写。
+  </p>
+  <div class="heart">♥</div>
+</section>
+
+<!-- ========================================
+     页脚
+     ======================================== -->
+<footer class="footer">
+  <p>2022.06.25 → Forever ♥ 我们的四周年</p>
+</footer>
+
+<!-- ========================================
+     Lightbox
+     ======================================== -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">&times;</button>
+  <button class="lightbox-prev" id="lightboxPrev">‹</button>
+  <button class="lightbox-next" id="lightboxNext">›</button>
+  <img src="" alt="" id="lightboxImg">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<!-- 音乐播放按钮 — 左下角，歌词上方 -->
+<div class="music-btn-wrap">
+  <button class="music-btn" id="musicBtn" type="button" aria-label="音乐播放" title="播放音乐">♪</button>
+  <span class="music-hint" id="songHint">点我听歌 ♫</span>
+</div>
+
+<div class="floating-controls" aria-label="页面控制">
+  <button class="float-btn back-to-top" id="backToTop" type="button" aria-label="回到顶部" title="回到顶部">↑</button>
+</div>
+
+<!-- 桌面歌词（固定悬浮，不随页面滚动） -->
+<div class="desktop-lyrics" id="desktopLyrics">
+  <span class="lyric-song-tag" id="lyricSongTag"></span>
+  <span class="lyric-current" id="lyricCurrent"></span>
+  <span class="lyric-next" id="lyricNext"></span>
+</div>
+
+<!-- ========================================
+     JavaScript
+     ======================================== -->
+<script>
+/* ============================================
+   1. 照片数据配置 — 在这里添加你的照片！
+   ============================================
+   格式说明：
+   {
+     src: "<照片路径>",        // 照片路径
+     chapter: "ch4",           // 所属章节（ch1-ch6, timeline, etc），或年份 "2022"
+     caption: "说明文字",       // 显示在 lightbox 下方
+     year: 2022                // 年份，用于筛选
+   }
+   示例：
+   { src: "照片/2025 五一 成都.jpg", chapter: "ch5", caption: "五一在成都，把见面走成一段春天", year: 2025 },
+*/
+const photoData = [
+  // ===== 2022 年 =====
+  // 暂无 2022 照片，后续补充后可放入 ch1 或 ch2。
+
+  // ===== 2023 年 =====
+  { src: "照片/2023.PNG", chapter: "ch3", caption: "还在同一段青春里的我们，把普通日常也过成了后来会想念的样子。", year: 2023, layout: "wide" },
+
+  // ===== 2024 年 =====
+  { src: "照片/2024-高考成人礼.png", chapter: "ch3", caption: "高考成人礼那天，我们站在青春的分岔口，也把彼此留在最郑重的记忆里。", year: 2024, layout: "tall" },
+  { src: "照片/2024-国庆.jpg", chapter: "ch4", caption: "生日烛光亮起的那一刻，十二小时高铁也变成了奔向你的路。", year: 2024, layout: "tall" },
+  { src: "照片/2024国庆 南京.jpg", chapter: "ch4", caption: "南京的日落替我们作证：隔着一千八百公里，见面依然值得。", year: 2024, layout: "feature" },
+
+  // ===== 2025 年 =====
+  { src: "照片/2025 五一 成都.jpg", chapter: "ch4", caption: "五一在成都，阳光、草地和你一起出现，把重逢走成了一段春天。", year: 2025, layout: "feature" },
+  { src: "照片/2025 五一 (2).jpg", chapter: "ch4", caption: "江安、望江和春熙路之间，都是我们把想念落地的证据。", year: 2025, layout: "square" },
+  { src: "照片/2025 五一.jpg", chapter: "ch4", caption: "把五月的成都收进相册，也把一起生活的想象悄悄放进未来。", year: 2025, layout: "tall" },
+  { src: "照片/2025-五一.jpg", chapter: "ch4", caption: "几个月的等待，最后都变成了镜头里靠近的这一瞬间。", year: 2025, layout: "tall" },
+  { src: "照片/2025 暑期.jpg", chapter: "ch5", caption: "夏天有风、有光，也有我们并肩站在一起的安定。", year: 2025, layout: "tall" },
+  { src: "照片/2025 暑期 (2).jpg", chapter: "ch5", caption: "换一种衣裳，去赴一场夏日里的小小约会。", year: 2025, layout: "tall" },
+  { src: "照片/2025暑期 家.jpg", chapter: "ch5", caption: "回到熟悉的地方，才更明白：有你在的日子，哪里都像家。", year: 2025, layout: "tall" },
+  { src: "照片/2025国庆 武汉.jpg", chapter: "ch5", caption: "武汉的江风和摩天轮，把新的城市也写进了我们的地图。", year: 2025, layout: "wide" },
+  { src: "照片/2025国庆-武汉.jpg", chapter: "ch5", caption: "在江边留下合照，也留下我们一次次奔向彼此的勇气。", year: 2025, layout: "tall" },
+
+  // ===== 2026 年 =====
+  { src: "照片/2026寒假.jpg", chapter: "ch5", caption: "寒假里的见面，是冬天递给我们的温柔补偿。", year: 2026, layout: "tall" },
+  { src: "照片/2026-寒假你来我的城市陪我过期末.jpg", chapter: "ch5", caption: "你来到我的城市陪我过期末，连忙碌都变得有了依靠。", year: 2026, layout: "wide" },
+  { src: "照片/2026 五一.jpg", chapter: "ch5", caption: "五一再次见面，拥抱仍然是所有想念最好的答案。", year: 2026, layout: "tall" },
+  { src: "照片/2026 五一 (2).jpg", chapter: "ch5", caption: "带着玩偶和笑意，把平凡的一天过成只属于我们的节日。", year: 2026, layout: "tall" },
+  { src: "照片/2026五一 去往你的城市.jpg", chapter: "ch5", caption: "去往你的城市，也去往我们一次又一次确认的未来。", year: 2026, layout: "tall" },
+  { src: "照片/2026五一 常州.jpeg", chapter: "ch5", caption: "常州的夜色里，我们继续把路途写成见面的理由。", year: 2026, layout: "tall" },
+];
+
+const photoWallFiles = [
+  "1769562025396.jpg",
+  "2024100216432456.jpg",
+  "2024100222334782.jpg",
+  "2024100301340204.jpg",
+  "3992cabba40e8855.jpg",
+  "-665739837e914bdf.jpg",
+  "Image_1724256668748.jpg",
+  "Image_1727847787683.jpg",
+  "Image_1747220836126.jpg",
+  "IMG_20241002_172536.jpg",
+  "IMG_20241004_230609.jpg",
+  "IMG_20241215_151903.jpg",
+  "IMG_20250221_213545.jpg",
+  "IMG_20250430_191945.jpg",
+  "IMG_20250501_114317.jpg",
+  "IMG_20250501_114412.jpg",
+  "IMG_20250501_115300.jpg",
+  "IMG_20250502_140449.jpg",
+  "IMG_20250502_181522.jpg",
+  "IMG_20250503_195346.jpg",
+  "IMG_20250504_184717.jpg",
+  "IMG_20250505_122853.jpg",
+  "IMG_20250505_171626.jpg",
+  "IMG_20250505_183758586.jpg",
+  "IMG_20250619_085806.jpg",
+  "IMG_20250619_085859.jpg",
+  "IMG_20250803_121937.jpg",
+  "IMG_20250803_195031.jpg",
+  "IMG_20250807_192340.jpg",
+  "IMG_20250808_151939.jpg",
+  "IMG_20250808_173727.jpg",
+  "IMG_20250808_175149.jpg",
+  "IMG_20250808_175242.jpg",
+  "IMG_20250808_234131.jpg",
+  "IMG_20250809_172932.jpg",
+  "IMG_20250809_173008.jpg",
+  "IMG_20250809_175743.jpg",
+  "IMG_20250809_181339.jpg",
+  "IMG_20250809_181341.jpg",
+  "IMG_20251001_175511.jpg",
+  "IMG_20251002_115932.jpg",
+  "IMG_20251002_132753.jpg",
+  "IMG_20251002_134531.jpg",
+  "IMG_20251002_145158.jpg",
+  "IMG_20251004_203132.jpg",
+  "IMG_20251004_212109.jpg",
+  "IMG_20251006_131800.jpg",
+  "IMG_20251006_154836.jpg",
+  "IMG_20251006_161440.jpg",
+  "IMG_20251006_161534.jpg",
+  "IMG_20260108_153158.jpg",
+  "IMG_20260109_102636.jpg",
+  "IMG_20260109_102832.jpg",
+  "IMG_20260110_184720.jpg",
+  "IMG_20260110_223306.jpg",
+  "IMG_20260128_184850.jpg",
+  "IMG_20260212_145954.jpg",
+  "IMG_20260212_215906.jpg",
+  "IMG_20260212_220722.jpg",
+  "IMG_20260430_175933.jpg",
+  "IMG_20260430_193227.jpg",
+  "IMG_20260501_135741.jpg",
+  "IMG_20260501_190019.jpg",
+  "IMG_20260501_200435.jpg",
+  "IMG_20260502_174915.jpg",
+  "IMG_20260503_182627.jpg",
+  "IMG_20260505_154843.jpg",
+  "IMG_20260505_160202.jpg",
+  "IMG_20260505_162808.jpg",
+  "IMG_20260505_183920.jpg",
+  "IMG_20260505_185607.jpg",
+  "IMG_20260505_190033.jpg",
+  "IMG_20260505_192137.jpg",
+  "IMG_2896.JPG",
+  "IMG_3052.JPG",
+  "IMG_3977.JPG",
+  "IMG_4623.JPG",
+  "mmexport1777716282531.jpg",
+  "retouch_2025050410374245.jpg",
+  "retouch_2025050514360399.jpg",
+  "retouch_2025050514422415.jpg",
+  "retouch_2025080721252956.jpg",
+  "retouch_2025080721313719.jpg",
+  "retouch_2025080721374653.jpg",
+];
+
+const photoWallData = photoWallFiles.map((file) => ({
+  src: `照片/照片墙/${file}`,
+  caption: "",
+  wall: true
+}));
+
+const allPhotoData = [...photoData, ...photoWallData];
+
+const ringYearData = [
+  { year: 2022, title: "故事开始", note: "那一年，我们在三中相遇，很多伏笔悄悄落下。", angle: -118, size: 140 },
+  { year: 2023, title: "慢慢靠近", note: "喜欢没有很大声，却在每天的靠近里变得确定。", angle: -36, size: 204 },
+  { year: 2024, title: "成人礼与远方", note: "成人礼、高考和南京的日落，把长大与异地写进我们的故事。", angle: 36, size: 268 },
+  { year: 2025, title: "重逢与奔赴", note: "成都、家乡和武汉，都被我们走成了见面的路。", angle: 118, size: 332 },
+  { year: 2026, title: "继续往前", note: "寒假、期末、五一和常州，四周年不是终点，是下一圈年轮的开始。", angle: 180, size: 396 }
+];
+
+/* ============================================
+   2. 在一起天数计算
+   ============================================ */
+(function() {
+  const startDate = new Date(2022, 5, 25); // 2022年6月25日 (月份从0开始)
+  const daysEl = document.getElementById('daysCounter');
+
+  function updateDays() {
+    const now = new Date();
+    const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+    daysEl.textContent = '在一起的第 ' + (diff + 1) + ' 天';
+  }
+  updateDays();
+  setInterval(updateDays, 60000); // 每分钟更新（跨天时显示正确）
+})();
+
+/* ============================================
+   3. 滚动渐入动画 (Intersection Observer)
+   ============================================ */
+(function() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.section, .outro').forEach(el => observer.observe(el));
+})();
+
+/* ============================================
+   4. 导航栏 — 滚动隐藏/显示 + 高亮
+   ============================================ */
+(function() {
+  const nav = document.getElementById('nav');
+  let lastScroll = 0;
+
+  window.addEventListener('scroll', () => {
+    const now = window.scrollY;
+    if (now > lastScroll && now > 200) {
+      nav.classList.add('hidden');
+    } else {
+      nav.classList.remove('hidden');
+    }
+    lastScroll = now;
+  });
+})();
+
+/* ============================================
+   5. 渲染四年年轮
+   ============================================ */
+function renderPhotoRings() {
+  const stage = document.getElementById('ringStage');
+  const summary = document.getElementById('ringSummary');
+  if (!stage || !summary) return;
+
+  const ringDisplayData = ringYearData.filter(item => photoData.some(photo => photo.year === item.year));
+  const yearsToRender = ringDisplayData.length ? ringDisplayData : ringYearData;
+  const maxSize = Math.max(...yearsToRender.map(item => item.size));
+  const center = 50;
+
+  const rings = yearsToRender.map((item, idx) => `
+    <div
+      class="year-ring"
+      style="--size: ${item.size / maxSize * 100}%; --alpha: ${0.18 + idx * 0.08};"
+      aria-hidden="true">
+    </div>
+  `).join('');
+
+  const nodes = yearsToRender.map((item) => {
+    const radius = item.size / maxSize * 42;
+    const rad = item.angle * Math.PI / 180;
+    const x = center + Math.cos(rad) * radius;
+    const y = center + Math.sin(rad) * radius;
+    return `
+      <button class="ring-node" type="button" data-ring-year="${item.year}" style="--x: ${x}%; --y: ${y}%;">
+        ${item.year}
+      </button>
+    `;
+  }).join('');
+
+  stage.innerHTML = `
+    ${rings}
+    <div class="ring-core">
+      <strong>四年</strong>
+      <span>${yearsToRender[0].year} → ${yearsToRender[yearsToRender.length - 1].year}</span>
+    </div>
+    ${nodes}
+  `;
+
+  summary.innerHTML = yearsToRender.map((item) => {
+    const photos = photoData.filter(photo => photo.year === item.year);
+    const thumbs = photos.slice(0, 3).map(photo => {
+      const realIdx = photoData.indexOf(photo);
+      return `<img src="${photo.src}" alt="${photo.caption || item.title}" data-index="${realIdx}" loading="lazy">`;
+    }).join('');
+    return `
+      <article class="ring-year-card" data-ring-card="${item.year}">
+        <h3>${item.year} · ${item.title}</h3>
+        <p>${item.note}</p>
+        <span class="ring-count">${photos.length} 张照片已收入这一圈</span>
+        ${thumbs ? `<div class="ring-thumbs">${thumbs}</div>` : ''}
+      </article>
+    `;
+  }).join('');
+
+  const activateYear = (year) => {
+    document.querySelectorAll('.ring-node').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.ringYear === String(year));
+    });
+    document.querySelectorAll('.ring-year-card').forEach(card => {
+      card.classList.toggle('active', card.dataset.ringCard === String(year));
+    });
+  };
+
+  stage.addEventListener('click', (event) => {
+    const btn = event.target.closest('.ring-node');
+    if (!btn) return;
+    activateYear(btn.dataset.ringYear);
+  });
+
+  summary.addEventListener('click', (event) => {
+    const card = event.target.closest('.ring-year-card');
+    if (!card) return;
+    activateYear(card.dataset.ringCard);
+  });
+
+  activateYear(yearsToRender[0].year);
+}
+
+renderPhotoRings();
+
+/* ============================================
+   6. 渲染各章节照片
+   ============================================ */
+(function() {
+  const chapters = ['ch1','ch2','ch3','ch4','ch5','ch6'];
+  chapters.forEach(ch => {
+    const container = document.getElementById('photos-' + ch);
+    if (!container) return;
+    const photos = photoData.filter(p => p.chapter === ch);
+    if (photos.length === 0) {
+      container.classList.add('is-empty');
+      return;
+    }
+
+    container.classList.add('has-photos');
+    container.innerHTML = photos.map((p) => {
+      const realIdx = photoData.indexOf(p);
+      const layout = p.layout ? ` ${p.layout}` : '';
+      return `
+        <figure class="photo-card${layout}" data-index="${realIdx}" tabindex="0" role="button" aria-label="查看照片：${p.caption || ''}">
+          <img src="${p.src}" alt="${p.caption || ''}" data-index="${realIdx}" loading="lazy">
+          <figcaption>${p.caption || ''}</figcaption>
+        </figure>
+      `;
+    }).join('');
+  });
+})();
+
+/* ============================================
+   7. 渲染照片墙
+   ============================================ */
+function renderPhotoWall() {
+  const grid = document.getElementById('photoWallGrid');
+  const loadMore = document.getElementById('loadMoreWall');
+  if (!grid || !loadMore) return;
+
+  const batchSize = 24;
+  let rendered = 0;
+
+  const renderNextBatch = () => {
+    const nextBatch = photoWallData.slice(rendered, rendered + batchSize);
+    const html = nextBatch.map((photo, idx) => {
+      const realIdx = photoData.length + rendered + idx;
+      return `
+        <button class="wall-photo-card" type="button" data-index="${realIdx}" aria-label="查看照片墙照片">
+          <img src="${photo.src}" alt="照片墙照片" loading="lazy">
+        </button>
+      `;
+    }).join('');
+
+    grid.insertAdjacentHTML('beforeend', html);
+    rendered += nextBatch.length;
+
+    const remaining = photoWallData.length - rendered;
+    loadMore.hidden = remaining <= 0;
+    loadMore.textContent = remaining > 0 ? `展开更多照片（还剩 ${remaining} 张）` : '照片已全部展开';
+  };
+
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('#loadMoreWall')) return;
+    renderNextBatch();
+  });
+  renderNextBatch();
+}
+
+renderPhotoWall();
+
+/* ============================================
+   8. Lightbox 照片查看器
+   ============================================ */
+(function() {
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const closeBtn = document.getElementById('lightboxClose');
+  const prevBtn = document.getElementById('lightboxPrev');
+  const nextBtn = document.getElementById('lightboxNext');
+
+  let currentIndex = -1;
+
+  function openLightbox(index) {
+    if (index < 0 || index >= allPhotoData.length) return;
+    currentIndex = index;
+    const photo = allPhotoData[index];
+    lightboxImg.src = photo.src;
+    lightboxImg.alt = photo.caption || '';
+    lightboxCaption.textContent = photo.caption || '';
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    currentIndex = -1;
+  }
+
+  function nextPhoto() {
+    if (allPhotoData.length === 0) return;
+    const next = (currentIndex + 1) % allPhotoData.length;
+    openLightbox(next);
+  }
+
+  function prevPhoto() {
+    if (allPhotoData.length === 0) return;
+    const prev = (currentIndex - 1 + allPhotoData.length) % allPhotoData.length;
+    openLightbox(prev);
+  }
+
+  // 点击任意照片打开 lightbox
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-index]');
+    if (!trigger) return;
+    const index = parseInt(trigger.dataset.index);
+    openLightbox(index);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const trigger = e.target.closest('.photo-card[data-index]');
+    if (!trigger || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    openLightbox(parseInt(trigger.dataset.index));
+  });
+
+  closeBtn.addEventListener('click', closeLightbox);
+  nextBtn.addEventListener('click', nextPhoto);
+  prevBtn.addEventListener('click', prevPhoto);
+
+  // 键盘控制
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') nextPhoto();
+    if (e.key === 'ArrowLeft') prevPhoto();
+  });
+
+  // 点击背景关闭
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+})();
+
+/* ============================================
+   9. 触摸滑动支持（移动端 lightbox）
+   ============================================ */
+(function() {
+  const lightbox = document.getElementById('lightbox');
+  let touchStartX = 0, touchEndX = 0;
+
+  lightbox.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  lightbox.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        // 左滑 → 下一张
+        const nextBtn = document.getElementById('lightboxNext');
+        nextBtn.click();
+      } else {
+        // 右滑 → 上一张
+        const prevBtn = document.getElementById('lightboxPrev');
+        prevBtn.click();
+      }
+    }
+  });
+})();
+
+/* ============================================
+   9. 回到顶部
+   ============================================ */
+(function() {
+  const backToTop = document.getElementById('backToTop');
+  if (backToTop) {
+    window.addEventListener('scroll', () => {
+      backToTop.classList.toggle('visible', window.scrollY > 600);
+    }, { passive: true });
+
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+})();
+
+/* ============================================
+   10. 音乐播放器 & 桌面歌词（LRC 精准同步）
+   ============================================ */
+(function() {
+  const musicBtn = document.getElementById('musicBtn');
+  const songHint = document.getElementById('songHint');
+  const desktopLyrics = document.getElementById('desktopLyrics');
+  const lyricSongTag = document.getElementById('lyricSongTag');
+  const lyricCurrent = document.getElementById('lyricCurrent');
+  const lyricNext = document.getElementById('lyricNext');
+
+  // 解析 LRC 字符串为 [{time, text}] 数组，scale 缩放 + offset 整体偏移（秒）
+  function parseLRC(lrc, scale, offset) {
+    const lines = [];
+    const regex = /\[(\d{2}):(\d{2})\.(\d{2})\](.*)/;
+    lrc.forEach(raw => {
+      const m = raw.match(regex);
+      if (m) {
+        const time = (parseInt(m[1]) * 60 + parseInt(m[2]) + parseInt(m[3]) / 100) * (scale || 1) - (offset || 0);
+        const text = m[4].trim();
+        if (text && time >= 0) lines.push({ time: time, text: text });
+      }
+    });
+    return lines;
+  }
+
+  // 歌曲配置（LRC 格式，精准时间轴）
+  const songs = [
+    {
+      title: '有我呢',
+      artist: '郭一凡',
+      src: '照片/有我呢.mp3',
+      scale: 1.0,
+      offset: 0,
+      lrc: [
+        '[00:20.03]世界很大',
+        '[00:23.78]我们很小',
+        '[00:27.74]懒惰碰巧转角遇到无聊',
+        '[00:35.41]这么多人',
+        '[00:39.45]那么热闹',
+        '[00:43.15]我爱安静你恰好怕吵',
+        '[00:50.02]时而成熟懂事',
+        '[00:53.33]时而孩子模样',
+        '[00:57.56]在冰冷的城互相取暖',
+        '[01:05.61]在你面前我也可以放下麻烦',
+        '[01:13.10]尽情地欣赏 你的笑',
+        '[01:19.91]你想去很多地方',
+        '[01:23.62]可一个人不敢',
+        '[01:27.35]我会拉着你手',
+        '[01:31.31]一个一个实现它',
+        '[01:35.28]我们都会老的',
+        '[01:40.32]老到走不远了',
+        '[01:43.86]至少楼下散步 有我呢',
+        '[01:50.83]你说你没安全感 习惯了孤单',
+        '[01:58.60]我会让你习惯 多一个人陪伴',
+        '[02:06.21]我们都怕寂寞 被时间慢慢吞没',
+        '[02:14.69]别怕 亲爱的 有我呢',
+        '[02:38.61]时而成熟懂事',
+        '[02:41.79]时而孩子模样',
+        '[02:46.28]在冰冷的城互相取暖',
+        '[02:53.99]在你面前我也可以放下麻烦',
+        '[03:01.61]尽情地欣赏 你的笑',
+        '[03:08.36]你想去很多地方',
+        '[03:12.01]可一个人不敢',
+        '[03:15.98]我会拉着你手',
+        '[03:19.72]一个一个实现它',
+        '[03:23.65]我们都会老的',
+        '[03:28.74]老到走不远了',
+        '[03:32.31]至少楼下散步 有我呢',
+        '[03:39.18]你说你没安全感 习惯了孤单',
+        '[03:46.99]我会让你习惯 多一个人陪伴',
+        '[03:54.68]我们都怕寂寞 被时间慢慢吞没',
+        '[04:03.10]别怕 亲爱的 有我呢',
+        '[04:11.45]别怕 亲爱的 有我呢'
+      ]
+    },
+    {
+      title: '稳稳的幸福',
+      artist: '陈奕迅',
+      src: '照片/稳稳的幸福_v4.mp3',
+      scale: 1.0,
+      offset: 9.0,
+      lrc: [
+        '[00:09.58]有一天',
+        '[00:11.70]我发现自怜资格都已没有',
+        '[00:17.13]只剩下不知疲倦的肩膀',
+        '[00:20.99]担负着简单的满足',
+        '[00:25.12]有一天',
+        '[00:27.48]开始从平淡日子感受快乐',
+        '[00:33.11]看到了明明白白的远方',
+        '[00:37.27]我要的幸福',
+        '[00:40.74]我要稳稳的幸福',
+        '[00:44.66]能抵挡末日的残酷',
+        '[00:49.44]在不安的深夜',
+        '[00:52.54]能有个归宿',
+        '[00:56.71]我要稳稳的幸福',
+        '[01:00.80]能用双手去碰触',
+        '[01:05.25]每次伸手入怀中',
+        '[01:08.57]有你的温度',
+        '[01:45.40]有一天',
+        '[01:47.71]我发现自怜资格都已没有',
+        '[01:53.02]只剩下不知疲倦的肩膀',
+        '[01:57.06]担负着简单的满足',
+        '[02:01.37]有一天',
+        '[02:03.54]开始从平淡日子感受快乐',
+        '[02:09.18]看到了明明白白的远方',
+        '[02:13.26]我要的幸福',
+        '[02:16.98]我要稳稳的幸福',
+        '[02:21.07]能抵挡末日的残酷',
+        '[02:25.46]在不安的深夜',
+        '[02:28.58]能有个归宿',
+        '[02:32.70]我要稳稳的幸福',
+        '[02:36.94]能用双手去碰触',
+        '[02:41.32]每次伸手入怀中',
+        '[02:44.50]有你的温度',
+        '[02:48.85]我要稳稳的幸福',
+        '[02:52.62]能抵挡失落的痛楚',
+        '[02:57.60]一个人的路途',
+        '[03:00.56]也不会孤独',
+        '[03:04.82]我要稳稳的幸福',
+        '[03:08.77]能用生命做长度',
+        '[03:13.22]无论我身在何处',
+        '[03:16.57]都不会迷途',
+        '[03:20.88]我要稳稳的幸福',
+        '[03:29.53]这是我想要的幸福'
+      ]
+    }
+  ];
+
+  // 预解析 LRC（按歌曲 scale + offset）
+  songs.forEach(s => { s._lyrics = parseLRC(s.lrc, s.scale, s.offset); });
+
+  let currentSongIndex = -1;
+  let audio = null;
+  let lyricInterval = null;
+  let lastLyricIdx = -1;
+
+  // 根据当前播放时间查找对应的歌词行索引（LRC 已在解析时按 scale 缩放）
+  function findLyricIdx(lyrics, currentTime) {
+    let idx = -1; // -1 表示还在前奏，未到第一句
+    for (let i = 0; i < lyrics.length; i++) {
+      if (lyrics[i].time <= currentTime + 0.1) idx = i;
+      else break;
+    }
+    return idx;
+  }
+
+  // 更新桌面歌词（当前句 + 下一句），前奏期间显示歌名
+  function updateDesktopLyric(lyrics, idx, songTitle, songArtist) {
+    if (idx === lastLyricIdx) return;
+    lastLyricIdx = idx;
+
+    lyricCurrent.style.opacity = '0';
+    lyricCurrent.style.transform = 'translateY(6px)';
+    lyricNext.style.opacity = '0';
+
+    setTimeout(() => {
+      if (idx < 0) {
+        // 前奏 / 间奏：显示歌名和歌手
+        lyricCurrent.textContent = songTitle;
+        lyricCurrent.style.opacity = '1';
+        lyricCurrent.style.transform = 'translateY(0)';
+        lyricNext.textContent = songArtist;
+        lyricNext.style.opacity = '0.45';
+      } else {
+        const cur = lyrics[idx];
+        const nxt = idx + 1 < lyrics.length ? lyrics[idx + 1] : null;
+        lyricCurrent.textContent = cur.text;
+        lyricCurrent.style.opacity = '1';
+        lyricCurrent.style.transform = 'translateY(0)';
+        lyricNext.textContent = nxt ? nxt.text : '';
+        lyricNext.style.opacity = nxt ? '0.65' : '0';
+      }
+    }, 180);
+  }
+
+  function startLyricSync(songIndex) {
+    if (lyricInterval) clearInterval(lyricInterval);
+    const song = songs[songIndex];
+    const lyrics = song._lyrics;
+    lastLyricIdx = -1;
+
+    lyricSongTag.textContent = song.title + ' · ' + song.artist;
+    // 初始显示（可能是前奏，idx 会是 -1）
+    const initIdx = findLyricIdx(lyrics, 0);
+    updateDesktopLyric(lyrics, initIdx, song.title, song.artist);
+
+    lyricInterval = setInterval(() => {
+      if (!audio || audio.paused) return;
+      const idx = findLyricIdx(lyrics, audio.currentTime);
+      updateDesktopLyric(lyrics, idx, song.title, song.artist);
+    }, 200);
+  }
+
+  function stopLyricSync() {
+    if (lyricInterval) { clearInterval(lyricInterval); lyricInterval = null; }
+  }
+
+  function showDesktopLyrics(songIndex) {
+    lyricSongTag.textContent = songs[songIndex].title + ' · ' + songs[songIndex].artist;
+    desktopLyrics.classList.add('visible');
+  }
+
+  function hideDesktopLyrics() {
+    desktopLyrics.classList.remove('visible');
+    stopLyricSync();
+  }
+
+  function playSong(songIndex) {
+    if (audio) {
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+      stopLyricSync();
+    }
+
+    const song = songs[songIndex];
+    audio = new Audio(song.src);
+    audio.volume = 0.7;
+
+    audio.addEventListener('loadedmetadata', () => {
+      audio.play().catch(() => {});
+      showDesktopLyrics(songIndex);
+      startLyricSync(songIndex);
+    });
+
+    audio.addEventListener('ended', () => {
+      const nextSongIndex = (songIndex + 1) % songs.length;
+      playSong(nextSongIndex);
+    });
+
+    audio.addEventListener('error', () => {
+      stopLyricSync();
+      musicBtn.classList.remove('playing');
+      hideDesktopLyrics();
+      currentSongIndex = -1;
+      songHint.textContent = '点我听歌 ♫';
+    });
+
+    audio.load();
+    currentSongIndex = songIndex;
+    musicBtn.classList.add('playing');
+    songHint.textContent = song.title;
+  }
+
+  function stopMusic() {
+    if (audio) {
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+      audio = null;
+    }
+    stopLyricSync();
+    musicBtn.classList.remove('playing');
+    hideDesktopLyrics();
+    currentSongIndex = -1;
+    songHint.textContent = '';
+  }
+
+  musicBtn.addEventListener('click', () => {
+    if (currentSongIndex === -1) {
+      playSong(0);
+    } else if (currentSongIndex === 0) {
+      playSong(1);
+    } else {
+      stopMusic();
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
